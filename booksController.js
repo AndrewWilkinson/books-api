@@ -47,7 +47,7 @@ exports.deleteByID = function (req, res, next) {
 
 exports.edit = function (req, res, next) {
 
-    if (!req.body.name) {
+    if (!req.body.title) {
         return (next(createError(400, "Title is requred")))
     }
     else if (!req.body.author) {
@@ -124,7 +124,6 @@ exports.return = function (req, res, next) {
 
         res.send(`One copy of ${bookFound.title} has been returned`)
     }
-
 }
 
 exports.read = function (req, res, next) {
@@ -154,5 +153,21 @@ exports.read = function (req, res, next) {
             return book;
         })   
         res.send(`${req.body.name} is now a proud reader of ${bookFound.title}`)
+    }
+}
+
+////Implement: compare titles for similarity, effecienty and asynchronously
+exports.find = function (req, res, next) {
+
+    if (!req.body.title) {
+        return (next(createError(400, "Title is requred")))
+    }
+
+    let bookFound = books.find((book) => book.title.includes(req.body.title))
+    {
+        if (!bookFound) {
+            return (next(createError(404, "No book of that title found, try using a smaller fragment")))
+        }
+        res.send(bookFound)
     }
 }
