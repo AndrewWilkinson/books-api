@@ -74,14 +74,24 @@ exports.edit = function (req, res, next) {
 
 exports.checkout = function (req, res, next) {
 
-    const bookFound = books.find((book) => book.id == req.params.id)
+    let bookFound = books.find((book) => book.id == req.params.id)
     {
         if (!bookFound) {
             return (next(createError(404, "No book of that Id found")))
         }
 
-        if (!bookFound.available) {
-            bookFound.available--;/////////////Needs to happen on a persisted object via a persisting mutation
+        if (!books[bookFound.id].available) {
+            bookFound.available--;
+
+            { books.set(    
+                id = bookFound.id,
+                title = bookFound.title,
+                author = bookFound.author,
+                available = bookFound.available,
+                read = bookFound.read,
+                )
+            } 
+
             res.send(`One copy of ${bookFound.title} has been checked out`)
         }
         else {
@@ -93,12 +103,22 @@ exports.checkout = function (req, res, next) {
 
 exports.return = function (req, res, next) {
 
-    const bookFound = books.find((book) => book.id == req.params.id)
+    let bookFound = books.find((book) => book.id == req.params.id)
     {
         if (!bookFound) {
             return (next(createError(404, "No book of that Id found")))
         }
-        bookFound.available++;/////////////Needs to happen on a persisted object via a persisting mutation
+        bookFound.available++;
+
+        { books.set(    
+            id = bookFound.id,
+            title = bookFound.title,
+            author = bookFound.author,
+            available = bookFound.available,
+            read = bookFound.read,
+            )
+        } 
+
         res.send(`One copy of ${bookFound.title} has been returned`)
     }
 
@@ -110,12 +130,22 @@ exports.read = function (req, res, next) {
         return (next(createError(400, "A name is required")))
     }
 
-    const bookFound = books.find((book) => book.id == req.params.id)
+    let bookFound = books.find((book) => book.id == req.params.id)
     {
         if (!bookFound) {
             return (next(createError(404, "No book of that Id found")))
         }
-        bookFound.read.push("req.params.id")/////////////Needs to happen on a persisted object via a persisting mutation
+
+        bookFound.read.push(req.params.name) // adds a name to the list of readers on temp object
+        
+        { books.set(    
+            id = bookFound.id,
+            title = bookFound.title,
+            author = bookFound.author,
+            available = bookFound.available,
+            read = bookFound.read,
+            )
+        } 
         res.send(`${req.body.name} is now a proud reader of ${bookFound.title}`)
     }
 }
